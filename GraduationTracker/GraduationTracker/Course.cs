@@ -12,5 +12,19 @@ namespace GraduationTracker
         public string Name { get; set; }
         public int Mark { get; set; }
         public int Credits { get; }
-     }
+
+        //Constructor for Course
+        public Course(int Id, string Name, int Mark = 0, int Credits = 1)
+        {
+            this.Id = Id;
+            this.Name = Name;
+            this.Mark = Mark;
+            this.Credits = Credits;
+        }
+
+    }
+
+
+
+
 }

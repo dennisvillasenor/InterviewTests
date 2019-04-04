@@ -11,5 +11,12 @@ namespace GraduationTracker
         public int Id { get; set; }
         public Course[] Courses { get; set; }
         public STANDING Standing { get; set; } = STANDING.None;
+
+        public Student(int id, Course[] Courses )
+        {
+            this.Id = id;
+            this.Courses = Courses;
+        }
+
     }
 }

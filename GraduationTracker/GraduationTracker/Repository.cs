@@ -8,127 +8,112 @@ namespace GraduationTracker
 {
     public class Repository
     {
+
+        //removed bulky for loop for the following Get statements.
         public static Student GetStudent(int id)
         {
             var students = GetStudents();
-            Student student = null;
-
-            for (int i = 0; i < students.Length; i++)
-            {
-                if (id == students[i].Id)
-                {
-                    student = students[i];
-                }
-            }
-            return student;
+            return students.Single(x => x.Id == id);
         }
 
         public static Diploma GetDiploma(int id)
         {
             var diplomas = GetDiplomas();
-            Diploma diploma = null;
-
-            for (int i = 0; i < diplomas.Length; i++)
-            {
-                if (id == diplomas[i].Id)
-                {
-                    diploma = diplomas[i];
-                }
-            }
-            return diploma;
-
+            return diplomas.Single(x => x.Id == id);
         }
 
         public static Requirement GetRequirement(int id)
         {
             var requirements = GetRequirements();
-            Requirement requirement = null;
-
-            for (int i = 0; i < requirements.Length; i++)
-            {
-                if (id == requirements[i].Id)
-                {
-                    requirement = requirements[i];
-                }
-            }
-            return requirement;
+            return requirements.Single(x=>x.Id == id);
         }
 
 
-        private static Diploma[] GetDiplomas()
+        //Simplified this by making constructor call to Diploma's constructor.
+        public static Diploma[] GetDiplomas()
         {
             return new[]
             {
-                new Diploma
-                {
-                    Id = 1,
-                    Credits = 4,
-                    Requirements = new int[]{100,102,103,104}
-                }
+                new Diploma(1, 4, new int[]{100,102,103,104})
             };
         }
 
-        public static Requirement[] GetRequirements()
-        {   
-                return new[]
+        //Added in a Get Courses Method that generates all 4 courses in a single call which will be used by Get Requirements and
+        //Get Students so their course list remains consistent.
+
+        public static Course[] GetCourses()
+        {
+            return new[]
                 {
-                    new Requirement{Id = 100, Name = "Math", MinimumMark=50, Courses = new int[]{1}, Credits=1 },
-                    new Requirement{Id = 102, Name = "Science", MinimumMark=50, Courses = new int[]{2}, Credits=1 },
-                    new Requirement{Id = 103, Name = "Literature", MinimumMark=50, Courses = new int[]{3}, Credits=1},
-                    new Requirement{Id = 104, Name = "Physichal Education", MinimumMark=50, Courses = new int[]{4}, Credits=1 }
+                    new Course(1, "Math"),
+                    new Course(2, "Science"),
+                    new Course(3, "Literature"),
+                    new Course(4, "Physichal Education")
                 };
         }
-        private static Student[] GetStudents()
+
+        //Changed to construction calls to Requirement class.  Min mark and credits are all 50 and 1 for all of these
+        //so ommitted them as constructor arguments but any new requirements that use different min mark and credits can add those
+        //in as arguments.
+
+        public static Requirement[] GetRequirements()
         {
-            return new[]
+            Course[] CourseList = GetCourses();
+            List<Requirement> Requirements = new List<Requirement>();
+
+            for (int i = 0; i < CourseList.Length; i++)
             {
-               new Student
-               {
-                   Id = 1,
-                   Courses = new Course[]
-                   {
-                        new Course{Id = 1, Name = "Math", Mark=95 },
-                        new Course{Id = 2, Name = "Science", Mark=95 },
-                        new Course{Id = 3, Name = "Literature", Mark=95 },
-                        new Course{Id = 4, Name = "Physichal Education", Mark=95 }
-                   }
-               },
-               new Student
-               {
-                   Id = 2,
-                   Courses = new Course[]
-                   {
-                        new Course{Id = 1, Name = "Math", Mark=80 },
-                        new Course{Id = 2, Name = "Science", Mark=80 },
-                        new Course{Id = 3, Name = "Literature", Mark=80 },
-                        new Course{Id = 4, Name = "Physichal Education", Mark=80 }
-                   }
-               },
-            new Student
+                //assumes that courselist is a list of course Id's relevant to this requirement.
+                Requirements.Add(new Requirement(100 + i + 1, CourseList[i].Name, new int[] { CourseList[i].Id }));
+            }
+
+            return Requirements.ToArray();
+        }
+
+        public static Student[] GetStudents()
+        {
+
+            //Simllified by calling student constructor and passing list of courses using Get Courses method
+            Student[] StudentList =  new[]
             {
-                Id = 3,
-                Courses = new Course[]
+               new Student(1, GetCourses()),
+               new Student(2, GetCourses()),
+               new Student(3, GetCourses()),
+               new Student(4, GetCourses())
+            };
+
+            int[][] StudentMarks = new int[][]
+            {
+                new int[] { 95, 95, 95, 95 },
+                new int[] { 80, 80, 80, 80 },
+                new int[] { 50, 50, 50, 50 },
+                new int[] { 40, 40, 40, 40 }
+            };
+
+
+            for (int i = 0; i < StudentList.Length; i++)
+            {
+                StudentList[i].Courses = SetMarks(StudentList[i].Courses, StudentMarks[i]);
+            }
+
+            return StudentList;
+        }
+
+
+        private static Course[] SetMarks(Course[] Courses, int[] Marks)
+        {
+            if (Marks.Length == Courses.Length)
+            {
+                for (int i = 0; i < Courses.Length; i++)
                 {
-                    new Course{Id = 1, Name = "Math", Mark=50 },
-                    new Course{Id = 2, Name = "Science", Mark=50 },
-                    new Course{Id = 3, Name = "Literature", Mark=50 },
-                    new Course{Id = 4, Name = "Physichal Education", Mark=50 }
-                }
-            },
-            new Student
-            {
-                Id = 4,
-                Courses = new Course[]
-                {
-                    new Course{Id = 1, Name = "Math", Mark=40 },
-                    new Course{Id = 2, Name = "Science", Mark=40 },
-                    new Course{Id = 3, Name = "Literature", Mark=40 },
-                    new Course{Id = 4, Name = "Physichal Education", Mark=40 }
+                    Courses[i].Mark = Marks[i];
                 }
             }
 
-            };
+            return Courses;
         }
+
+
     }
 
 
